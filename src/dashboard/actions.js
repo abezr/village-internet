@@ -1,40 +1,38 @@
-
-
-export function receivedServerState(state){
+export function receivedWorkerState(state){
     return {
-        type: 'RECEIVED_SERVER_STATE',
+        type: 'RECEIVED_WORKER_STATE',
         state
     }
 }
 
-export function setSpeed(id, speed){
+export function setCoreSpeed(id, speed){
     return {
-        type: 'SET_ENDPOINT_SPEED',
+        type: 'SET_CORE_SPEED',
         id,
         speed,
-        remote: `setSpeedLimit ${id} ${speed}`
+        remote: speed
     }
 }
 
 export function turnOn(id){
     return {
-        type: 'TURN_ENDPOINT_ON',
+        type: 'TURN_CORE_ON',
         id,
-        remote: `turnOn ${id}`
+        remote: `start`
     }
 }
 
 export function turnOff(id){
     return {
-        type: 'TURN_ENDPOINT_OFF',
+        type: 'TURN_CORE_OFF',
         id,
-        remote: `turnOff ${id}`
+        remote: `stop`
     }
 }
 
-export function endpointSelected(id){
+export function coreSelected(id){
     return {
-        type: 'ENDPOINT_SELECTED',
+        type: 'CORE_SELECTED',
         id
     }
 }

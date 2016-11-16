@@ -6,7 +6,7 @@ import {connect} from 'react-redux'
 import * as actions from '../actions'
 
 
-const EndpointChart = ({data}) => (
+const WorkerChart = ({data}) => (
     <div className="row">
         <div className="col-md-11" style={{height: '400px', paddingTop:'20px'}}>
             <ResponsiveContainer>
@@ -15,8 +15,8 @@ const EndpointChart = ({data}) => (
                     <YAxis tickCount={10}/>
                     <Tooltip />
                     <CartesianGrid />
-                    <Line dataKey="speed" isAnimationActive={false} unit="Mb/s" />
-                    <Line dataKey="limit" isAnimationActive={false} unit="Mb/s" stroke="red"/>
+                    <Line dataKey="speed" isAnimationActive={false} unit="ops/s" />
+                    <Line dataKey="limit" isAnimationActive={false} unit="ops/s" stroke="red"/>
                 </LineChart>
             </ResponsiveContainer>
         </div>
@@ -39,12 +39,12 @@ const TopNav = ({projectName}) => (
     </Navbar>
 )
 
-const SpeedBar = ({min, max, value}) => (
+const SpeedBar = ({min, max, value, label}) => (
     <ProgressBar
             now={value} 
             min={min} 
             max={max}
-            label={`${value} Mb/s`} 
+            label={`${label} ops/s`} 
             />
 )
 
@@ -58,71 +58,71 @@ const SpeedLimit = ({currentLimit, onSetSpeed}) => (
         step="1" />
 )
 
-const EndpointInfo = ({endpoint, onSelectEndpoint}) => (
+const WorkerInfo = ({worker, onSelectWorker}) => (
     <div className="col-md-2">
-        <a href="#" onClick={onSelectEndpoint}>
-            {endpoint.id}
+        <a href="#" onClick={onSelectWorker}>
+            Core {worker.id}
         </a><br/>
         <span className="label label-info">
-            {`${endpoint.speedSet} Mb/s`}
+            {`${worker.speedSet} %`}
         </span>
     </div>
 )
 
-const Endpoint = ({endpoint, onTurnOn, onTurnOff, onSetSpeed, onSelectEndpoint}) => (
+const Worker = ({worker, onTurnOn, onTurnOff, onSetSpeed, onSelectWorker}) => (
     <div className="row" style={{paddingBottom: '10px'}}>
-        <EndpointInfo endpoint={endpoint} onSelectEndpoint={() => onSelectEndpoint(endpoint.id)} />
+        <WorkerInfo worker={worker} onSelectWorker={() => onSelectWorker(worker.id)} />
         <div className="col-md-1">
             <Switch 
-                value={endpoint.turnedOn}
-                onChange={(e, v) => endpoint.turnedOn ? onTurnOff(endpoint.id) : onTurnOn(endpoint.id)} 
+                value={worker.turnedOn}
+                onChange={(e, v) => worker.turnedOn ? onTurnOff(worker.id) : onTurnOn(worker.id)} 
                 onColor="success" 
                 offColor="danger" 
                 bsSize="mini" />
         </div>
-        {endpoint.turnedOn && <div className="col-md-9">
-            <SpeedBar min={0} max={100} value={endpoint.speed} />
+        {worker.turnedOn && <div className="col-md-9">
+            <SpeedBar min={0} max={100} value={worker.speedSet} label={worker.speed} />
             <SpeedLimit 
-                currentLimit={endpoint.speedSet} 
-                onSetSpeed={s => onSetSpeed(endpoint.id, s)} 
+                currentLimit={worker.speedSet} 
+                onSetSpeed={s => onSetSpeed(worker.id, s)} 
                 />
         </div>}
     </div>
 )
 
-const EndpointsList = ({endpoints, onTurnOn, onTurnOff, onSetSpeed, onSelectEndpoint}) => (
+const WorkersList = ({workers, onTurnOn, onTurnOff, onSetSpeed, onSelectWorker}) => (
     <div>
-        {endpoints.map(e => 
-            <Endpoint 
+        {workers.map(e => 
+            <Worker 
                 key={e.id} 
-                endpoint={e} 
+                worker={e} 
                 onTurnOn={onTurnOn} 
                 onTurnOff={onTurnOff} 
                 onSetSpeed={onSetSpeed} 
-                onSelectEndpoint={onSelectEndpoint}
+                onSelectWorker={onSelectWorker}
                 />)}
     </div>
 )
 
-export const App = ({endpoints, chart, setSpeed, turnOn, turnOff, endpointSelected}) => (
+export const App = ({workers, chart, setCoreSpeed, turnOn, turnOff, coreSelected}) => (
     <div className="container">
-        <TopNav projectName="Village Internet" />
-        <EndpointsList 
-            endpoints={endpoints}
-            onSetSpeed={setSpeed}
+        <TopNav projectName="Heater 2" />
+        <WorkersList 
+            workers={workers}
+            onSetSpeed={setCoreSpeed}
             onTurnOn={turnOn}
             onTurnOff={turnOff} 
-            onSelectEndpoint={endpointSelected}/>
+            onSelectWorker={coreSelected}/>
         {chart && chart.selected && <div>
             <h4>{chart.selected} speed:</h4>
-            <EndpointChart data={chart.data}/>
+            <WorkerChart data={chart.data}/>
         </div>}
     </div>
 )
 
 export const AppContainer = connect(
     (store) => { return {
-        endpoints: store.endpoints,
+        workers: store.workersReducer,
         chart: store.chart
     }},
     actions
